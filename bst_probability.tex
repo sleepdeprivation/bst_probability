@@ -1,0 +1,78 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Christian Burke}
+\begin{document}
+With $0 < k < n$ and $k,n \in \mathbb{Z}$, we prove the following lemmas
+\section*{Lemma 1}
+$$ \prod_{i=k}^n i = \frac{n!}{(k-1)!}$$
+Proof:
+$$ \prod_{i=k}^n i = \prod_{i=k}^{n} i \frac{(k-1)!}{(k-1)!}
+ = \prod_{i=k}^n i \frac{\prod_{i=1}^{k-1} i}{(k-1)!}
+ = \frac{n!}{(k-1)!}$$
+\section*{Lemma 2}
+$$ \prod_{i=0}^k (n-i) = \frac{n!}{(n-k-1)!}$$
+Proof:
+$$ \prod_{i=0}^k n-i = (n)(n-1)\cdots(n-k) = \prod_{i=(n-k)}^n i$$
+And by using lemma 1 we get
+$$ \prod_{i=(n-k)}^n i = \frac{n!}{(n-k-1)!}$$
+\section*{Problem Statement}
+We are given a set of $n$ nodes in a valid binary search tree $B$, with unique keys from a (finite) set of contiguous integers $S$.\\
+We then pick another key $x \in S$, and begin searching for the key using a linear BST algorithm.\footnote{Is 'a linear BST' algorithm guaranteed to traverse nodes in a certain order? Can we prove that the linear BST algorithm is unique given certain constraints? (eg "nodes are traversed in same order")}
+How does $p(x \in B)$ change with each node traversed?\\
+\section*{Calculating $p(x \in B)_0$}
+Before beginning the search, ie at time $t=0$, we calculate $p(x \in B)_0$ as the probability that $x$ is chosen in $n$ tries from a set of $|S|$ items.\\
+The probability of picking an element that is not $x$ on the $1$st try is $\frac{1}{|S|}$. On the next try, it will be $\frac{1}{|S|-2}$, accounting for the missing element, and so on until we have the final probability as $\frac{1}{|S|- n + 1}$.\\
+We can calculate the probability of picking $x$ by,
+$$p(x \in B)_0
+=\prod_{i=0}^{n-1}\frac{1}{ |S| - i}
+=\frac{1}{\prod_{i=0}^{n-1} |S| - i}
+= \frac{(|S|-(n-1)-1)!}{|S|!}$$
+$$ = \frac{(|S|- n)!}{|S|!} $$
+Finally we can confirm:
+$$1 - \frac{|S|!}{(|S|-n-1)!} = \frac{(|S|-n-1)! + |S|!}{(|S|-n-1)!}$$
+
+\section*{A different method for calculating the initial probability}
+
+There are $|S|-1 \choose n-1$ ways to pick $x$, and then $n-1$ more elements. There are, in total, $|S| \choose n$ ways to pick $n$ elements. Thus,
+
+$$p(x \in B)_0
+	= 
+	\frac{
+			{|S| - 1 \choose n-1}
+		}{
+			{|S| \choose n}
+		}
+= 	
+		\frac{(|S|-1)!}{(n-1)!(|S|-1 - (n-1))!}
+	\div
+		\frac{|S|!}{n!(|S|-n)!}
+$$
+$$=	
+		\frac{(|S|-1)!}{n!(|S|-1 - n + 1)!}
+	\times
+		\frac{n!(|S|-n)!}{|S|!}
+=
+		\frac{(|S|-1)!}{(|S| - n)!}
+	\times
+		\frac{(|S|-n)!}{|S|!}
+$$
+$$=
+	\frac{
+		(|S|-1)! (|S|-n)!
+	}{
+		(|S|-1 - n)! |S|!
+	}
+$$
+
+\section*{GARBAGE}
+The probability of not picking $X$ is thus
+$$p(x \not \in B)_0 = \prod_{i=0}^{n-1} \bigg[ \frac{|S|-(i + 1)}{|S| - i} \bigg]
+= \frac{\prod_{i=0}^{n-1} |S|- (i+1)}{\prod_{i=0}^{n-1} |S| - i}
+= \frac{\prod_{i=0}^{n-1} (|S|-1)-i}{\prod_{i=0}^{n-1} |S| - i}$$
+$$= \frac{(|S|-1)!}{((|S| - 1) - n - 1)!} \frac{(|S| - n - 1)!}{|S|!}$$
+$$= \frac{(|S|-1)!(|S| - n - 1)!}{(|S| - n - 2)!|S|!}$$
+and through similar reasoning we can determine
+\end{document}
