@@ -22,19 +22,26 @@ $$ \prod_{i=(n-k)}^n i = \frac{n!}{(n-k-1)!}$$
 We are given a set of $n$ nodes in a valid binary search tree $B$, with unique keys from a (finite) set of contiguous integers $S$.\\
 We then pick another key $x \in S$, and begin searching for the key using a linear BST algorithm.\footnote{Is 'a linear BST' algorithm guaranteed to traverse nodes in a certain order? Can we prove that the linear BST algorithm is unique given certain constraints? (eg "nodes are traversed in same order")}
 How does $p(x \in B)$ change with each node traversed?\\
-\section*{Calculating $p(x \in B)_0$}
-Before beginning the search, ie at time $t=0$, we calculate $p(x \in B)_0$ as the probability that $x$ is chosen in $n$ tries from a set of $|S|$ items.\\
-The probability of picking an element that is not $x$ on the $1$st try is $\frac{1}{|S|}$. On the next try, it will be $\frac{1}{|S|-2}$, accounting for the missing element, and so on until we have the final probability as $\frac{1}{|S|- n + 1}$.\\
-We can calculate the probability of picking $x$ by,
-$$p(x \in B)_0
-=\prod_{i=0}^{n-1}\frac{1}{ |S| - i}
-=\frac{1}{\prod_{i=0}^{n-1} |S| - i}
-= \frac{(|S|-(n-1)-1)!}{|S|!}$$
-$$ = \frac{(|S|- n)!}{|S|!} $$
-Finally we can confirm:
-$$1 - \frac{|S|!}{(|S|-n-1)!} = \frac{(|S|-n-1)! + |S|!}{(|S|-n-1)!}$$
+\section*{Calculating $p(x \in B)_0$ using products}
+Before beginning the search, ie at time $t=0$, we calculate $p(x \in B)_0$ as the probability that $x$ is chosen in $n$ tries from a set of $|S|$ items, by first calculating its inverse.\\
+The probability of not picking $x$ on the $1$st try is $\frac{|S|-1}{|S|}$. On the next try, it will be $\frac{|S|-2}{|S|-1}$, accounting for the missing element, and so on until we have the final probability as $\frac{|S|-n}{|S| - (n-1)}$.\\
+Thus the probability that we never picked $x$ for any node is:
+$$p(x \not \in B)_0 = \prod_{i = 0}^{n-1} \frac{|S|-(i+1)}{|S| - i} = \frac{\prod_{i = 0}^{n-1} (|S|-1)-i}{\prod_{i = 0}^{n-1} |S| - i}$$
+We can now apply lemma 2 on both numerator and denominator to get
+$$
+\bigg(\frac{(|S|-1)!}{((|S|-1) - (n-1) - 1)!}\bigg)
+\bigg(\frac{|S|!}{(|S| - (n-1) - 1)!}\bigg)^{-1}
+$$
+$$
+= 
+\frac{|S|-1!}{(|S|-n-1)!}
+\frac{(|S|-n)!}{|S|!}
+= \frac{|S|-n}{|S|}
+$$
+Which finally gives us\\
+$$p(x \in B)_0 = (1-p(x \not \in B)_0) = \frac{n}{|S|}$$
 
-\section*{A different method for calculating the initial probability}
+\section*{Calculating $p(x \in B)_0$ using binomial coefficients}
 
 There are $|S|-1 \choose n-1$ ways to pick $x$, and then $n-1$ more elements. There are, in total, $|S| \choose n$ ways to pick $n$ elements. Thus,
 
@@ -46,12 +53,12 @@ $$p(x \in B)_0
 			{|S| \choose n}
 		}
 = 	
-		\frac{(|S|-1)!}{(n-1)!(|S|-1 - (n-1))!}
+		\frac{(|S|-1)!}{(n-1)!((|S|-1) - (n-1))!}
 	\div
 		\frac{|S|!}{n!(|S|-n)!}
 $$
 $$=	
-		\frac{(|S|-1)!}{n!(|S|-1 - n + 1)!}
+		\frac{(|S|-1)!}{(n-1)!(|S|-1 - n + 1)!}
 	\times
 		\frac{n!(|S|-n)!}{|S|!}
 =
@@ -61,12 +68,26 @@ $$=
 $$
 $$=
 	\frac{
-		(|S|-1)! (|S|-n)!
+		(|S|-1)!n!
 	}{
-		(|S|-1 - n)! |S|!
-	}
+		|S|! (n-1)!
+	} = \frac{n}{|S|}
 $$
-
+\section*{Some notation}
+For a given node $B_i$ in the tree $B$,\\
+$b_i$ is the value at that node,\\
+$|B_i|$ is the size of the sub-tree rooted at $B_i$.
+\section*{Calculating $p(x \in B)_1$}
+After checking the root node, which we will call $B_1$, we will have either found $x$, or we will not have. If we found $x$, we now know $p(x \in B)_1 = 1$, so we will consider the other case.\\
+We must now calculate $p(x \in B)_1 = p(x \in B | b_1 \neq x)$.\\
+Because the set $B$ is a binary tree, the search algorithm will disregard one of $B_1$'s two children, reducing the size of the domain. We'll call $B_1$'s children $B_L$ and $B_R$. Since all the values here are arbitrary, we can say without loss of generality that the algorithm will pick $B_L$ as the next node to examine, which we will now label $B_2$, and further, we can claim that the algorithm has found $x > b_1$, since it would be the same either way.
+\footnote{If such a bold claim makes you uncomfortable, we can write $x \oplus b_2$ where $\oplus \in \{<, >\}$}\\
+We have now ruled out every element in the set $\{b_i | b_i <= b_1\}$, and we are ready for our calculation. Let's call the new domain $S_1 = S - \{b_i | b_i <= b_1 \}$. We can use the previous result to obtain
+$$p(x \in B)_1 = \frac{|B_2|}{|S_1|}$$
+That is, the size of the sub-tree $B_L$, divided by the size of the reduced domain $S_1$.
+\section*{In general, $p(x \in B)_i$}
+We now have a general pattern. The algorithm will examin a sequence of $k$ nodes $\{B_1, B_2, B_3 \cdots B_k\}$, as it does this, it will generate subsets of $S$ according to the following:
+$$S_n = S_{n-1} - \{b_i | b_i <= b_1 \}$$.
 \section*{GARBAGE}
 The probability of not picking $X$ is thus
 $$p(x \not \in B)_0 = \prod_{i=0}^{n-1} \bigg[ \frac{|S|-(i + 1)}{|S| - i} \bigg]
@@ -74,5 +95,13 @@ $$p(x \not \in B)_0 = \prod_{i=0}^{n-1} \bigg[ \frac{|S|-(i + 1)}{|S| - i} \bigg
 = \frac{\prod_{i=0}^{n-1} (|S|-1)-i}{\prod_{i=0}^{n-1} |S| - i}$$
 $$= \frac{(|S|-1)!}{((|S| - 1) - n - 1)!} \frac{(|S| - n - 1)!}{|S|!}$$
 $$= \frac{(|S|-1)!(|S| - n - 1)!}{(|S| - n - 2)!|S|!}$$
+---\\
+We can calculate the probability of picking $x$ by,
+$$p(x \in B)_0
+=\prod_{i=0}^{n-1}\frac{1}{ |S| - i}
+=\frac{1}{\prod_{i=0}^{n-1} |S| - i}
+= \frac{(|S|-(n-1)-1)!}{|S|!}$$
+$$ = \frac{(|S|- n)!}{|S|!}
+=\frac{1}{|S|!/(n-1)!} = \frac{(n-1)!}{|S|!}$$
 and through similar reasoning we can determine
 \end{document}
