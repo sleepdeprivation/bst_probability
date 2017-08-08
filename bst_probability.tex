@@ -5,29 +5,16 @@
 \usepackage{amssymb}
 \author{Christian Burke}
 \begin{document}
-With $0 < k < n$ and $k,n \in \mathbb{Z}$, we prove the following lemmas
-\section*{Lemma 1}
-$$ \prod_{i=k}^n i = \frac{n!}{(k-1)!}$$
-Proof:
-$$ \prod_{i=k}^n i = \prod_{i=k}^{n} i \frac{(k-1)!}{(k-1)!}
- = \prod_{i=k}^n i \frac{\prod_{i=1}^{k-1} i}{(k-1)!}
- = \frac{n!}{(k-1)!}$$
-\section*{Lemma 2}
-$$ \prod_{i=0}^k (n-i) = \frac{n!}{(n-k-1)!}$$
-Proof:
-$$ \prod_{i=0}^k n-i = (n)(n-1)\cdots(n-k) = \prod_{i=(n-k)}^n i$$
-And by using lemma 1 we get
-$$ \prod_{i=(n-k)}^n i = \frac{n!}{(n-k-1)!}$$
 \section*{Problem Statement}
 We are given a set of $n$ nodes in a valid binary search tree $B$, with unique keys from a (finite) set of contiguous integers $S$.\\
-We then pick another key $x \in S$, and begin searching for the key using a linear BST algorithm.\footnote{Is 'a linear BST' algorithm guaranteed to traverse nodes in a certain order? Can we prove that the linear BST algorithm is unique given certain constraints? (eg "nodes are traversed in same order")}
+We then pick a key $x \in S$, and begin searching for the key using a linear BST algorithm.\footnote{Is 'a linear BST' algorithm guaranteed to traverse nodes in a certain order? Can we prove that the linear BST algorithm is unique given certain constraints? (eg "nodes are traversed in same order")}
 How does $p(x \in B)$ change with each node traversed?\\
 \section*{Calculating $p(x \in B)_0$ using products}
 Before beginning the search, ie at time $t=0$, we calculate $p(x \in B)_0$ as the probability that $x$ is chosen in $n$ tries from a set of $|S|$ items, by first calculating its inverse.\\
 The probability of not picking $x$ on the $1$st try is $\frac{|S|-1}{|S|}$. On the next try, it will be $\frac{|S|-2}{|S|-1}$, accounting for the missing element, and so on until we have the final probability as $\frac{|S|-n}{|S| - (n-1)}$.\\
 Thus the probability that we never picked $x$ for any node is:
 $$p(x \not \in B)_0 = \prod_{i = 0}^{n-1} \frac{|S|-(i+1)}{|S| - i} = \frac{\prod_{i = 0}^{n-1} (|S|-1)-i}{\prod_{i = 0}^{n-1} |S| - i}$$
-We can now apply lemma 2 on both numerator and denominator to get
+We can now apply lemma 2 (Appendix A) on both numerator and denominator to get
 $$
 \bigg(\frac{(|S|-1)!}{((|S|-1) - (n-1) - 1)!}\bigg)
 \bigg(\frac{|S|!}{(|S| - (n-1) - 1)!}\bigg)^{-1}
@@ -43,7 +30,7 @@ $$p(x \in B)_0 = (1-p(x \not \in B)_0) = \frac{n}{|S|}$$
 
 \section*{Calculating $p(x \in B)_0$ using binomial coefficients}
 
-There are $|S|-1 \choose n-1$ ways to pick $x$, and then $n-1$ more elements. There are, in total, $|S| \choose n$ ways to pick $n$ elements. Thus,
+There are $|S|-1 \choose n-1$ ways to pick $x$ and then pick $n-1$ more elements. There are, in total, $|S| \choose n$ ways to pick $n$ elements. Thus,
 
 $$p(x \in B)_0
 	= 
@@ -73,21 +60,42 @@ $$=
 		|S|! (n-1)!
 	} = \frac{n}{|S|}
 $$
-\section*{Some notation}
+\section*{Some Notation}
 For a given node $B_i$ in the tree $B$,\\
 $b_i$ is the value at that node,\\
 $|B_i|$ is the size of the sub-tree rooted at $B_i$.
 \section*{Calculating $p(x \in B)_1$}
-After checking the root node, which we will call $B_1$, we will have either found $x$, or we will not have. If we found $x$, we now know $p(x \in B)_1 = 1$, so we will consider the other case.\\
-We must now calculate $p(x \in B)_1 = p(x \in B | b_1 \neq x)$.\\
-Because the set $B$ is a binary tree, the search algorithm will disregard one of $B_1$'s two children, reducing the size of the domain. We'll call $B_1$'s children $B_L$ and $B_R$. Since all the values here are arbitrary, we can say without loss of generality that the algorithm will pick $B_L$ as the next node to examine, which we will now label $B_2$, and further, we can claim that the algorithm has found $x > b_1$, since it would be the same either way.
-\footnote{If such a bold claim makes you uncomfortable, we can write $x \oplus b_2$ where $\oplus \in \{<, >\}$}\\
-We have now ruled out every element in the set $\{b_i | b_i <= b_1\}$, and we are ready for our calculation. Let's call the new domain $S_1 = S - \{b_i | b_i <= b_1 \}$. We can use the previous result to obtain
-$$p(x \in B)_1 = \frac{|B_2|}{|S_1|}$$
-That is, the size of the sub-tree $B_L$, divided by the size of the reduced domain $S_1$.
+After checking the root node, which we will call $B_0$, we will have either found $x$, or we will not have. If we found $x$, we now know $p(x \in B)_1 = 1$, so we will consider the other case.\\
+We must now calculate $p(x \in B)_1 = p(x \in B | b_0 \neq x)$.\\
+Because the set $B$ is a binary tree, the search algorithm will disregard one of $B_0$'s two children, reducing the size of the domain. We'll call $B_0$'s children $B_L$ and $B_R$. Since all the values here are arbitrary, we can say without loss of generality that the algorithm will pick $B_L$ as the next node to examine, which we will now label $B_1$, and further, we can claim that the algorithm has found $x > b_0$, since it would be the same either way.
+\footnote{If such a bold claim makes you uncomfortable, we can write $x \oplus b_0$ where $\oplus \in \{<, >\}$}\\
+We have now ruled out every element in the set $\{b_i | b_i <= b_0\}$, and we are ready for our calculation. Let's call the new domain $S_1 = S - \{b_i | b_i <= b_0 \}$. We can use the previous result to obtain
+$$p(x \in B)_1 = \frac{|B_1|}{|S_1|}$$
+That is, the size of the sub-tree $B_1$, divided by the size of the reduced domain $S_1$.
 \section*{In general, $p(x \in B)_i$}
-We now have a general pattern. The algorithm will examin a sequence of $k$ nodes $\{B_1, B_2, B_3 \cdots B_k\}$, as it does this, it will generate subsets of $S$ according to the following:
-$$S_n = S_{n-1} - \{b_i | b_i <= b_1 \}$$.
+We now have a general pattern. The algorithm will examine a sequence of $k$ nodes $\{B_0, B_1, B_2, B_3 \cdots B_k\}$, when a node is examined, we can generate subsets of $S$ according to the following:
+$$S_n = S_{n-1} - \{b_i | b_i <= b_{n-1} \}$$
+With $S_0$ being the entire domain $S$, and $B_0$ being the root node, acting as seed values for the recurrence. This means the probability in general is
+$$p(x \in B)_n = \frac{|B_{n}|}{|S_n|}$$
+Note that the probability is calculated using\\
+1) The sizes of the sub-trees rooted at the children of the current node, and\\
+2) The reduced set $S_n$ (in turn dependent on $b_{n-1}$)
+\pagebreak
+\section*{Appendix A - Lemmas}
+
+With $0 < k < n$ and $k,n \in \mathbb{Z}$, we prove the following lemmas
+\subsection*{Lemma 1}
+$$ \prod_{i=k}^n i = \frac{n!}{(k-1)!}$$
+Proof:
+$$ \prod_{i=k}^n i = \prod_{i=k}^{n} i \frac{(k-1)!}{(k-1)!}
+ = \prod_{i=k}^n i \frac{\prod_{i=1}^{k-1} i}{(k-1)!}
+ = \frac{n!}{(k-1)!}$$
+\subsection*{Lemma 2}
+$$ \prod_{i=0}^k (n-i) = \frac{n!}{(n-k-1)!}$$
+Proof:
+$$ \prod_{i=0}^k n-i = (n)(n-1)\cdots(n-k) = \prod_{i=(n-k)}^n i$$
+And by using lemma 1 we get
+$$ \prod_{i=(n-k)}^n i = \frac{n!}{(n-k-1)!}$$
 \section*{GARBAGE}
 The probability of not picking $X$ is thus
 $$p(x \not \in B)_0 = \prod_{i=0}^{n-1} \bigg[ \frac{|S|-(i + 1)}{|S| - i} \bigg]
